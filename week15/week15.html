@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff8ef">
+    <title>วันนี้กินอะไรดี?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            font-family: "Kanit", "Tahoma", sans-serif;
+            color: #30291f;
+            background: #fff8ef;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            --orange: #f27b35;
+            --muted: #91877d;
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(ellipse at 75% 42%, rgba(255, 227, 197, .52), transparent 34rem), #fff8ef;
+        }
+
+        button, a { font: inherit; }
+        .page { width: min(1120px, calc(100% - 64px)); min-height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
+        .topbar { height: 94px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(89, 68, 46, .09); }
+        .brand { display: inline-flex; align-items: center; gap: 10px; color: #33291f; font-size: 20px; font-weight: 600; text-decoration: none; }
+        .brand-icon { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 13px; background: #ffead8; font-size: 21px; }
+        .topbar-note, .footer { color: var(--muted); font-size: 13px; font-weight: 300; }
+        .topbar-note { display: inline-flex; align-items: center; gap: 9px; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #67b783; box-shadow: 0 0 0 4px rgba(103, 183, 131, .13); }
+        .hero { flex: 1; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 64px; padding: 48px 0 58px; }
+        .intro { padding: 12px 0 0 22px; }
+        .eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 17px; color: #df6522; font-size: 14px; }
+        h1 { margin: 0; color: #30291f; font-size: clamp(52px, 6vw, 76px); font-weight: 600; line-height: 1.13; letter-spacing: -1.5px; }
+        h1 span { color: var(--orange); }
+        .intro-copy { margin: 19px 0 29px; color: #877c70; font-size: 16px; font-weight: 300; line-height: 1.8; }
+        .pick-button { display: inline-flex; align-items: center; justify-content: center; gap: 13px; min-width: 234px; min-height: 58px; padding: 0 19px; border: 0; border-radius: 17px; color: #fff; background: linear-gradient(135deg, #f58b47, #ed702d); box-shadow: 0 10px 22px rgba(223, 101, 34, .23); cursor: pointer; font-size: 16px; font-weight: 500; transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease; }
+        .pick-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 13px 26px rgba(223, 101, 34, .3); }
+        .pick-button:focus-visible { outline: 3px solid #ffc89d; outline-offset: 4px; }
+        .pick-button:disabled { cursor: wait; opacity: .8; }
+        .button-icon { font-size: 18px; }
+        .button-arrow { margin-left: 4px; font-size: 21px; font-weight: 300; }
+        .hint { margin: 15px 0 0 4px; color: #a3998e; font-size: 12px; font-weight: 300; }
+        .hint span { margin-right: 5px; color: var(--orange); }
+        .result-wrap { position: relative; width: min(100%, 470px); justify-self: center; padding: 13px 14px 20px; }
+        .result-card { position: relative; z-index: 1; overflow: hidden; padding: 11px; border: 1px solid rgba(97, 68, 39, .07); border-radius: 27px; background: #fff; box-shadow: 0 24px 60px rgba(100, 67, 35, .12); transform: rotate(1.3deg); transition: transform .25s ease; }
+        .result-card:hover { transform: rotate(0); }
+        .image-wrap { position: relative; display: grid; overflow: hidden; aspect-ratio: 1.18 / 1; place-items: center; border-radius: 19px; background: radial-gradient(ellipse at center, #fff7ec 0, #ffebd7 65%, #ffe1c1 100%); }
+        #food-image { width: 100%; height: 100%; object-fit: cover; }
+        #food-image:not([hidden]) { display: block; animation: reveal .45s ease both; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; gap: 13px; color: #a29484; font-size: 14px; font-weight: 300; line-height: 1.7; text-align: center; }
+        .empty-emoji { display: grid; width: 86px; height: 86px; place-items: center; border: 1px dashed rgba(215, 136, 75, .4); border-radius: 50%; background: rgba(255, 255, 255, .6); font-size: 42px; }
+        .image-tag { position: absolute; right: 13px; bottom: 13px; padding: 6px 12px; border: 1px solid rgba(255, 255, 255, .5); border-radius: 30px; color: #fff; background: rgba(48, 41, 31, .55); font-size: 12px; backdrop-filter: blur(7px); }
+        .result-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 9px 7px; }
+        .food-details { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 10px; padding: 0 9px 9px; }
+        .food-description { margin: 0; color: #877c70; font-size: 13px; font-weight: 300; line-height: 1.65; }
+        .food-price { margin: 0; color: #df6522; font-size: 18px; font-weight: 600; white-space: nowrap; }
+        .caption-label { margin: 0 0 3px; color: #a49a8e; font-size: 11px; font-weight: 300; }
+        .result-caption h2 { margin: 0; color: #392f25; font-size: 21px; font-weight: 500; }
+        .plate-icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 14px; background: #fff2e5; font-size: 20px; }
+        .card-shadow { position: absolute; right: 8%; bottom: 10px; left: 8%; height: 25px; border-radius: 50%; background: rgba(137, 92, 48, .13); filter: blur(14px); }
+        .sparkle { position: absolute; z-index: 2; color: #f5a450; user-select: none; }
+        .sparkle-one { top: 0; right: 4px; font-size: 29px; transform: rotate(12deg); }
+        .sparkle-two { bottom: 54px; left: 0; color: #f4c27e; font-size: 23px; }
+        .footer { display: flex; min-height: 65px; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid rgba(89, 68, 46, .09); }
+        .footer-icon { margin-right: 6px; }
+        .menu-count { color: #85786a; }
+
+        @keyframes reveal {
+            from { opacity: .45; transform: scale(1.025); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 760px) {
+            .page { width: min(100% - 38px, 520px); }
+            .topbar { height: 75px; }
+            .topbar-note { font-size: 11px; }
+            .hero { grid-template-columns: 1fr; gap: 32px; padding: 36px 0 35px; }
+            .intro { padding: 0; text-align: center; }
+            .eyebrow { justify-content: center; margin-bottom: 10px; }
+            h1 { font-size: clamp(48px, 12vw, 68px); }
+            .intro-copy { margin: 12px 0 22px; font-size: 14px; }
+            .desktop-break { display: none; }
+            .hint { margin-top: 11px; }
+            .result-wrap { width: min(100%, 410px); }
+            .footer { min-height: 57px; font-size: 11px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header class="topbar">
+            <a class="brand" href="#" aria-label="หน้าหลัก วันนี้กินอะไรดี">
+                <span class="brand-icon" aria-hidden="true">🍽️</span>
+                <span>กินไรดี</span>
+            </a>
+            <span class="topbar-note"><span class="status-dot"></span> รวมเมนูในเครื่องของคุณ</span>
+        </header>
+
+        <section class="hero" aria-labelledby="page-title">
+            <div class="intro">
+                <p class="eyebrow"><span aria-hidden="true">✨</span> หมดปัญหาคิดไม่ออก</p>
+                <h1 id="page-title">วันนี้กิน<br><span>อะไรดี?</span></h1>
+                <p class="intro-copy">ให้วงล้อช่วยเลือกเมนูอร่อย ๆ<br class="desktop-break"> จากรูปอาหารในโฟลเดอร์ของคุณ</p>
+                <button class="pick-button" id="pick-button" type="button">
+                    <span class="button-icon" aria-hidden="true">🎲</span>
+                    <span id="button-label">สุ่มเมนูให้หน่อย</span>
+                    <span class="button-arrow" aria-hidden="true">→</span>
+                </button>
+                <p class="hint"><span aria-hidden="true">↗</span> กดสุ่มได้เลย แล้วไปกินของอร่อยกัน!</p>
+            </div>
+
+            <div class="result-wrap">
+                <div class="sparkle sparkle-one" aria-hidden="true">✦</div>
+                <div class="sparkle sparkle-two" aria-hidden="true">✳</div>
+                <article class="result-card" aria-live="polite" aria-atomic="true">
+                    <div class="image-wrap">
+                        <div class="empty-state" id="empty-state">
+                            <span class="empty-emoji" aria-hidden="true">🍜</span>
+                            <span>เมนูถัดไปของคุณ<br>อาจเป็นจานนี้ก็ได้นะ</span>
+                        </div>
+                        <img id="food-image" alt="" hidden>
+                        <span class="image-tag" id="image-tag" hidden>เมนูของคุณ</span>
+                    </div>
+                    <div class="result-caption">
+                        <div>
+                            <p class="caption-label" id="caption-label">พร้อมเสิร์ฟความอร่อย</p>
+                            <h2 id="food-name">กดปุ่มเพื่อเริ่มสุ่ม</h2>
+                        </div>
+                        <span class="plate-icon" aria-hidden="true">🥢</span>
+                    </div>
+                    <div class="food-details">
+                        <p class="food-description" id="food-description">รอสุ่มเมนูอร่อย ๆ พร้อมคำอธิบายและราคา</p>
+                        <p class="food-price" id="food-price">— บาท</p>
+                    </div>
+                </article>
+                <div class="card-shadow" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <span><span class="footer-icon" aria-hidden="true">📁</span> สุ่มจากรูปอาหารในโฟลเดอร์นี้</span>
+            <span class="menu-count"><span id="menu-count">5</span> เมนูพร้อมให้สุ่ม</span>
+        </footer>
+    </main>
+
+    <script>
+        const foods = [
+            { name: "ข้าว", image: "ข้าว.jpg", description: "ข้าวสวยร้อน ๆ กินง่าย อิ่มท้องได้ทุกมื้อ", price: 15 },
+            { name: "ข้าวมันไก่", image: "ข้าวมันไก่.jpg", description: "ข้าวมันหอม ๆ เสิร์ฟพร้อมไก่นุ่มและน้ำจิ้มรสเด็ด", price: 50 },
+            { name: "มาม่า", image: "มาม่า.jpg", description: "บะหมี่กึ่งสำเร็จรูปร้อน ๆ เมนูง่าย ๆ ที่คุ้นเคย", price: 20 },
+            { name: "ส้มตำ", image: "ส้มตำ.jpg", description: "มะละกอกรอบตำรสจัดจ้าน เปรี้ยว เผ็ด แซ่บถึงใจ", price: 40 },
+            { name: "ไก่ย่าง", image: "ไก่ย่าง.jpg", description: "ไก่หมักเครื่องเทศย่างหอม ๆ หนังเกรียมน่ากิน", price: 60 }
+        ];
+
+        const button = document.querySelector("#pick-button");
+        const buttonLabel = document.querySelector("#button-label");
+        const image = document.querySelector("#food-image");
+        const emptyState = document.querySelector("#empty-state");
+        const imageTag = document.querySelector("#image-tag");
+        const foodName = document.querySelector("#food-name");
+        const foodDescription = document.querySelector("#food-description");
+        const foodPrice = document.querySelector("#food-price");
+        const captionLabel = document.querySelector("#caption-label");
+        const menuCount = document.querySelector("#menu-count");
+        let lastFood = null;
+        menuCount.textContent = String(foods.length);
+
+        function chooseFood() {
+            const options = foods.filter((food) => food !== lastFood);
+            return options[Math.floor(Math.random() * options.length)];
+        }
+
+        function showFood(food) {
+            image.src = food.image;
+            image.alt = food.name;
+            image.hidden = false;
+            emptyState.hidden = true;
+            imageTag.hidden = false;
+            foodName.textContent = food.name;
+            foodDescription.textContent = food.description;
+            foodPrice.textContent = `${food.price} บาท`;
+            captionLabel.textContent = "เมนูที่สุ่มได้วันนี้";
+        }
+
+        button.addEventListener("click", () => {
+            if (button.disabled) return;
+
+            button.disabled = true;
+            buttonLabel.textContent = "กำลังสุ่ม...";
+            captionLabel.textContent = "กำลังเลือกเมนูให้คุณ";
+
+            let ticks = 0;
+            const spinTimer = window.setInterval(() => {
+                showFood(foods[Math.floor(Math.random() * foods.length)]);
+                ticks += 1;
+
+                if (ticks >= 12) {
+                    window.clearInterval(spinTimer);
+                    const selected = chooseFood();
+                    showFood(selected);
+                    lastFood = selected;
+                    button.disabled = false;
+                    buttonLabel.textContent = "สุ่มอีกครั้ง";
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
